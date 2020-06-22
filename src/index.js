@@ -11,7 +11,7 @@ client.on("connect", function () {
   client.subscribe("/iot-status");
 
   setInterval(function () {
-    client.publish("/iot-sensor", "0");
+    client.publish("/iot-sensor", "10");
   }, 1000);
 });
 
