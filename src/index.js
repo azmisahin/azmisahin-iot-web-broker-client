@@ -1,20 +1,55 @@
-// required when running on node.js
+// MQTT Library
 var mqtt = require("mqtt");
 
-var client = mqtt.connect("mqtt://8ac98f73:7ae7c0ecf6148c3a@broker.shiftr.io", {
-  clientId: "javascript",
-});
+// Broker address is being restructured according to the current environment.
+var MQTT_URL = process.env.MQTT_URL || "mqtt://broker-test.kiwimobility.com";
 
+// Creating unique identity.
+var clientId = "app-" + Math.random().toString(16).substr(2, 8);
+
+// Connection definitions are being configured.
+var options = {
+  port: 1883,
+  clientId: clientId,
+};
+
+// Router
+var topic = "iot";
+
+// Create a client connection
+var client = mqtt.connect(MQTT_URL, options);
+
+/**
+ * Socket Event Handler
+ * @param {socket} client Client Information
+ * @param {array} topic Topic List
+ */
+function eventHandler(client, topic) {
+  // subscribe to a topic
+  client.subscribe(topic, function () {
+    // when a message arrives, do something with it
+    client.on("message", function (topic, data, packet) {
+      console.log("topic:", topic);
+      console.log("data:", data.toString());
+      //console.info("packet:", packet);
+      console.log("time:", new Date().toUTCString());
+      console.log("==================================================");
+    });
+  });
+}
+
+// When connected
 client.on("connect", function () {
-  console.log("client has connected!");
-
-  client.subscribe("/iot-status");
-
-  setInterval(function () {
-    client.publish("/iot-sensor", "10");
-  }, 1000);
+  // all topics are caught.
+  eventHandler(client, topic);
 });
 
-client.on("message", function (topic, message) {
-  console.log("new message:", topic, message.toString());
-});
+/**
+ * Send Data
+ */
+function sendData(topic, data) {
+  // Send
+  client.publish(topic, data, () => {});
+}
+
+sendData(topic, "1");
