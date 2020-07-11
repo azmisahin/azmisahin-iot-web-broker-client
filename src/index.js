@@ -52,4 +52,4 @@ function sendData(topic, data) {
   client.publish(topic, data, () => {});
 }
 
-sendData(topic, "1");
+//sendData(topic + "/1001", "1");
