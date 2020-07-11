@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"No test specified\" ",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "dev": "nodemon ./src/index.js"
   },
   "repository": {
     "type": "git",
@@ -23,6 +24,7 @@
   },
   "homepage": "https://github.com/azmisahin/azmisahin-iot-web-broker#readme",
   "dependencies": {
-    "mqtt": "^4.1.0"
+    "mqtt": "^4.1.0",
+    "nodemon": "^2.0.4"
   }
 }

@@ -6,6 +6,7 @@ char* ssid_password = "12345678";
 int brokerPort = 1883;
 char* brokerAddress = "broker-test.kiwimobility.com";
 
+char* hub = "iot";
 char* topic = "iot/1001";
 char* device = "iot-1001";
 char* device_id = "iot888888881001";
@@ -18,6 +19,12 @@ unsigned long lastMsg = 0;
 char data[MSG_BUFFER_SIZE];
 char contents[MSG_BUFFER_SIZE];
 int value = 0;
+
+
+char* reserved = "0xFFFF";
+char* command = "*SCOR";
+char* vendor = "OM";
+char* endInstraction = "#";
 
 void setup_wifi() {
 
@@ -80,9 +87,20 @@ void reconnect() {
 
     // Attempt to connect
     if (client.connect(clientId.c_str())) {
-      Serial.println("connected");
+      Serial.println("wakeup");
 
-      client.publish(topic, "wakeup");
+      char* instruction = "Q0";
+
+      int voltage = analogRead(0);
+      int power = analogRead(1);
+      int network_signal = analogRead(2);
+
+      snprintf (contents, MSG_BUFFER_SIZE, "%d,%d,%d", voltage, power, network_signal);
+      //snprintf (data, MSG_BUFFER_SIZE, "%s%s,%s,%s,%s,%s%s", reserved, command, vendor, device_id, instruction, contents, endInstraction );
+      snprintf (data, MSG_BUFFER_SIZE, "%s,%s,%s,%s,%s%s",  command, vendor, device_id, instruction, contents, endInstraction );
+
+      client.publish(hub, data);
+
 
       // ... and resubscribe
       client.subscribe(topic);
@@ -115,18 +133,15 @@ void loop() {
   if (now - lastMsg > pulse) {
     lastMsg = now;
 
-    char* reserved = "0xFFFF";
-    char* command = "*SCOR";
-    char* vendor = "OM";
-    char* endInstraction = "#";
+    char* instruction = "H0";
 
-    char* instruction = "Q0";
+    int device_status = 1;
+    int current_voltage = analogRead(0);
+    int network_signal = analogRead(1);
+    int current_power = analogRead(2);
+    int charhing_status = analogRead(3);
 
-    int voltage = analogRead(0);
-    int power = analogRead(1);
-    int network_signal = analogRead(2);
-
-    snprintf (contents, MSG_BUFFER_SIZE, "%d,%d,%d", voltage, power, network_signal);
+    snprintf (contents, MSG_BUFFER_SIZE, "%d,%d,%d,%d", current_voltage, network_signal, current_power, charhing_status );
     //snprintf (data, MSG_BUFFER_SIZE, "%s%s,%s,%s,%s,%s%s", reserved, command, vendor, device_id, instruction, contents, endInstraction );
     snprintf (data, MSG_BUFFER_SIZE, "%s,%s,%s,%s,%s%s",  command, vendor, device_id, instruction, contents, endInstraction );
 

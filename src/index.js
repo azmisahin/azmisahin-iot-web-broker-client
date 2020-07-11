@@ -14,7 +14,8 @@ var options = {
 };
 
 // Router
-var topic = "iot";
+var hub = "iot";
+var topics = ["iot/1001", "iot/1002", "iot/1003"];
 
 // Create a client connection
 var client = mqtt.connect(MQTT_URL, options);
@@ -40,8 +41,13 @@ function eventHandler(client, topic) {
 
 // When connected
 client.on("connect", function () {
-  // all topics are caught.
-  eventHandler(client, topic);
+  // Main Topic = hub
+  eventHandler(client, hub);
+
+  // topics.forEach((topic) => {
+  //   // All topic
+  //   eventHandler(client, topic);
+  // });
 });
 
 /**
@@ -52,4 +58,4 @@ function sendData(topic, data) {
   client.publish(topic, data, () => {});
 }
 
-//sendData(topic + "/1001", "1");
+sendData(hub + "/1001", "1");
